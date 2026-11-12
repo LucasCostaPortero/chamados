@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Chamados</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Sistema de Chamados</h1>
+    <nav>
+      <button class="aba ativa" data-tela="dashboard">Dashboard</button>
+      <button class="aba" data-tela="chamados">Chamados</button>
+      <button class="aba" data-tela="clientes">Clientes</button>
+      <button class="aba" data-tela="categorias">Categorias</button>
+      <button class="aba" data-tela="tecnicos">Técnicos</button>
+    </nav>
+  </header>
+
+  <div id="aviso" class="aviso oculto"></div>
+
+  <main>
+    <!-- DASHBOARD -->
+    <section id="tela-dashboard" class="tela">
+      <h2>Dashboard</h2>
+      <div id="cards-status" class="cards"></div>
+      <h3>Por prioridade</h3>
+      <div id="cards-prioridade" class="cards"></div>
+    </section>
+
+    <!-- CHAMADOS -->
+    <section id="tela-chamados" class="tela oculto">
+      <h2>Chamados</h2>
+      <div class="colunas">
+        <div>
+          <form id="form-filtro" class="filtros">
+            <select name="status">
+              <option value="">Status: todos</option>
+              <option>ABERTO</option><option>EM_ATENDIMENTO</option>
+              <option>AGUARDANDO_CLIENTE</option><option>FECHADO</option>
+            </select>
+            <select name="prioridade">
+              <option value="">Prioridade: todas</option>
+              <option>BAIXA</option><option>MEDIA</option><option>ALTA</option><option>CRITICA</option>
+            </select>
+            <select name="clienteId" class="sel-clientes"><option value="">Cliente: todos</option></select>
+            <button type="submit">Filtrar</button>
+          </form>
+          <table>
+            <thead><tr><th>#</th><th>Título</th><th>Cliente</th><th>Prioridade</th><th>Status</th><th>Técnico</th></tr></thead>
+            <tbody id="lista-chamados"></tbody>
+          </table>
+          <div class="paginacao">
+            <button id="pag-anterior">&laquo; Anterior</button>
+            <span id="pag-info"></span>
+            <button id="pag-proxima">Próxima &raquo;</button>
+          </div>
+        </div>
+
+        <div>
+          <form id="form-chamado" class="cartao">
+            <h3>Novo chamado</h3>
+            <input name="titulo" placeholder="Título" required maxlength="150">
+            <textarea name="descricao" placeholder="Descrição" required maxlength="2000"></textarea>
+            <select name="prioridade" required>
+              <option value="">Prioridade...</option>
+              <option>BAIXA</option><option>MEDIA</option><option>ALTA</option><option>CRITICA</option>
+            </select>
+            <select name="clienteId" class="sel-clientes" required><option value="">Cliente...</option></select>
+            <select name="categoriaId" class="sel-categorias" required><option value="">Categoria...</option></select>
+            <button type="submit">Abrir chamado</button>
+          </form>
+
+          <div id="detalhe" class="cartao oculto">
+            <h3 id="det-titulo"></h3>
+            <p id="det-info" class="muted"></p>
+            <p id="det-descricao"></p>
+
+            <div class="linha">
+              <select id="det-tecnico" class="sel-tecnicos"><option value="">Técnico...</option></select>
+              <button id="btn-atribuir">Atribuir</button>
+            </div>
+            <div class="linha">
+              <select id="det-status">
+                <option>EM_ATENDIMENTO</option><option>AGUARDANDO_CLIENTE</option><option>FECHADO</option>
+              </select>
+              <button id="btn-status">Alterar status</button>
+            </div>
+
+            <h4>Comentários</h4>
+            <ul id="det-comentarios"></ul>
+            <form id="form-comentario">
+              <input name="autor" placeholder="Autor" required maxlength="100">
+              <textarea name="texto" placeholder="Comentário" required maxlength="1000"></textarea>
+              <button type="submit">Comentar</button>
+            </form>
+            <button id="btn-excluir-chamado" class="perigo">Excluir chamado</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLIENTES -->
+    <section id="tela-clientes" class="tela oculto">
+      <h2>Clientes</h2>
+      <div class="colunas">
+        <table>
+          <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Telefone</th><th></th></tr></thead>
+          <tbody id="lista-clientes"></tbody>
+        </table>
+        <form id="form-clientes" class="cartao">
+          <h3>Cliente</h3>
+          <input type="hidden" name="id">
+          <input name="nome" placeholder="Nome" required maxlength="100">
+          <input name="email" type="email" placeholder="E-mail" required>
+          <input name="telefone" placeholder="Telefone" maxlength="20">
+          <button type="submit">Salvar</button>
+          <button type="reset" class="secundario">Limpar</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section id="tela-categorias" class="tela oculto">
+      <h2>Categorias</h2>
+      <div class="colunas">
+        <table>
+          <thead><tr><th>#</th><th>Nome</th><th>Descrição</th><th></th></tr></thead>
+          <tbody id="lista-categorias"></tbody>
+        </table>
+        <form id="form-categorias" class="cartao">
+          <h3>Categoria</h3>
+          <input type="hidden" name="id">
+          <input name="nome" placeholder="Nome" required maxlength="100">
+          <input name="descricao" placeholder="Descrição" maxlength="255">
+          <button type="submit">Salvar</button>
+          <button type="reset" class="secundario">Limpar</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- TÉCNICOS -->
+    <section id="tela-tecnicos" class="tela oculto">
+      <h2>Técnicos</h2>
+      <div class="colunas">
+        <table>
+          <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Perfil</th><th></th></tr></thead>
+          <tbody id="lista-tecnicos"></tbody>
+        </table>
+        <form id="form-tecnicos" class="cartao">
+          <h3>Técnico</h3>
+          <input type="hidden" name="id">
+          <input name="nome" placeholder="Nome" required maxlength="100">
+          <input name="email" type="email" placeholder="E-mail" required>
+          <select name="perfil" required>
+            <option value="TECNICO">TECNICO</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+          <button type="submit">Salvar</button>
+          <button type="reset" class="secundario">Limpar</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

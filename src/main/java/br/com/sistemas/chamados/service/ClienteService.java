@@ -8,22 +8,26 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.sistemas.chamados.dto.ClienteRequest;
 import br.com.sistemas.chamados.dto.ClienteResponse;
 import br.com.sistemas.chamados.entity.Cliente;
+import br.com.sistemas.chamados.exception.RecursoNaoEncontradoException;
 import br.com.sistemas.chamados.exception.RegraNegocioException;
+import br.com.sistemas.chamados.repository.ChamadoRepository;
 import br.com.sistemas.chamados.repository.ClienteRepository;
 
 @Service
 public class ClienteService {
 
     private final ClienteRepository repository;
+    private final ChamadoRepository chamadoRepository;
 
-    public ClienteService(ClienteRepository repository) {
+    public ClienteService(ClienteRepository repository, ChamadoRepository chamadoRepository) {
         this.repository = repository;
+        this.chamadoRepository = chamadoRepository;
     }
 
     @Transactional
     public ClienteResponse criar(ClienteRequest dto) {
         if (repository.existsByEmail(dto.email())) {
-            throw new RegraNegocioException("já existe cliente com o e-mail " + dto.email());
+            throw new RegraNegocioException("Já existe cliente com o e-mail " + dto.email());
         }
         Cliente salvo = repository.save(new Cliente(dto.nome(), dto.email(), dto.telefone()));
         return ClienteResponse.de(salvo);
@@ -36,7 +40,7 @@ public class ClienteService {
 
     @Transactional(readOnly = true)
     public ClienteResponse buscar(Long id) {
-        return ClienteResponse.de(buscar(Long id));
+        return ClienteResponse.de(buscarEntity(id));
     }
 
     @Transactional
@@ -53,12 +57,15 @@ public class ClienteService {
 
     @Transactional
     public void excluir(Long id) {
-        repository.delete(buscarEntity(id));
+        Cliente cliente = buscarEntity(id);
+        if (chamadoRepository.existsByClienteId(id)) {
+            throw new RegraNegocioException("Cliente " + id + " possui chamados e não pode ser excluído");
+        }
+        repository.delete(cliente);
     }
 
     private Cliente buscarEntity(Long id) {
         return repository.findById(id)
-        .orElseThrow(() -> new RecursoNaoEncontradoException(
-            "Cliente " + id + "não encontrado"));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente " + id + " não encontrado"));
     }
 }
