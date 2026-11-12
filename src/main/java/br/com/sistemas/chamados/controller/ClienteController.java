@@ -29,4 +29,29 @@ public class ClienteController {
     }
 
     @PostMapping
+    public ResponseEntity<ClienteResponse> criar(@Valid @RequestBody ClienteRequest dto) {
+        ClienteResponse criado = service.criar(dto);
+        return ResponseEntity.created(URI.create("/clientes/" + criado.id())).body(criado);
+    }
+
+    @GetMapping
+    public List<ClienteResponse> listar() {
+        return service.listar();
+    }
+
+    @GetMapping("/{id}")
+    public ClienteResponse buscar(@PathVariable Long id) {
+        return service.buscar(id);
+    }
+
+    @PutMapping("/{id}")
+    public ClienteResponse atualizar(@PathVariable Long id, @Valid @RequestBody ClienteRequest dto) {
+        return service.atualizar(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        service.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
 }
